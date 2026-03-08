@@ -3,31 +3,23 @@ import * as anchor from "@coral-xyz/anchor";
 const provider = anchor.AnchorProvider.env();
 anchor.setProvider(provider);
 
-const program = anchor.workspace.Bikechain;
+const program = anchor.workspace.Bici;
 
 async function main() {
 
-  const modelo = "Trek500";
-
-  const [bicicletaPDA] = anchor.web3.PublicKey.findProgramAddressSync(
-    [
-      Buffer.from("bicicleta"),
-      Buffer.from(modelo),
-      provider.wallet.publicKey.toBuffer(),
-    ],
-    program.programId
-  );
+  const bicicleta = anchor.web3.Keypair.generate();
 
   await program.methods
-    .crearBicicleta(modelo, "Trek", new anchor.BN(5000))
+    .crearBicicleta("Trek500", "Trek", new anchor.BN(5000))
     .accounts({
-      bicicleta: bicicletaPDA,
+      bicicleta: bicicleta.publicKey,
       usuario: provider.wallet.publicKey,
       systemProgram: anchor.web3.SystemProgram.programId,
     })
+    .signers([bicicleta])
     .rpc();
 
-  console.log("Bicicleta creada en:", bicicletaPDA.toString());
+  console.log("Bicicleta creada:", bicicleta.publicKey.toString());
 }
 
 main();
