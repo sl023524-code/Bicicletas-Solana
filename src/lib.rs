@@ -1,9 +1,9 @@
 use anchor_lang::prelude::*;
 
-declare_id!("6HqSLmbNV7gQ33fLNboZMyBKhYcJxXQD38Z8DPEemPx");
+declare_id!("11111111111111111111111111111111");
 
 #[program]
-pub mod bikechain {
+pub mod bici {
     use super::*;
 
     pub fn crear_bicicleta(
@@ -25,16 +25,9 @@ pub mod bikechain {
 }
 
 #[derive(Accounts)]
-#[instruction(modelo: String)]
 pub struct CrearBicicleta<'info> {
 
-    #[account(
-        init,
-        payer = usuario,
-        space = 8 + 32 + 4 + 50 + 4 + 50 + 8,
-        seeds = [b"bicicleta", modelo.as_bytes(), usuario.key().as_ref()],
-        bump
-    )]
+    #[account(init, payer = usuario, space = 8 + 32 + 64 + 64 + 8)]
     pub bicicleta: Account<'info, Bicicleta>,
 
     #[account(mut)]
