@@ -1,21 +1,18 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { Bikechain } from "../target/types/bikechain";
 
 describe("bikechain", () => {
 
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
-  const program = anchor.workspace.Bikechain as Program<Bikechain>;
-
-  const modelo = "Bici montaña";
-
-  let bicicletaPDA;
+  const program = anchor.workspace.Bikechain as Program;
 
   it("Crear bicicleta", async () => {
 
-    [bicicletaPDA] = anchor.web3.PublicKey.findProgramAddressSync(
+    const modelo = "Trek500";
+
+    const [bicicletaPDA] = anchor.web3.PublicKey.findProgramAddressSync(
       [
         Buffer.from("bicicleta"),
         Buffer.from(modelo),
@@ -25,7 +22,7 @@ describe("bikechain", () => {
     );
 
     await program.methods
-      .crearBicicleta(modelo, "Trek", new anchor.BN(4500))
+      .crearBicicleta(modelo, "Trek", new anchor.BN(5000))
       .accounts({
         bicicleta: bicicletaPDA,
         usuario: provider.wallet.publicKey,
@@ -35,7 +32,8 @@ describe("bikechain", () => {
 
     const cuenta = await program.account.bicicleta.fetch(bicicletaPDA);
 
-    console.log("Bicicleta creada:", cuenta);
+    console.log("Bicicleta:", cuenta);
+
   });
 
 });
