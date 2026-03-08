@@ -24,7 +24,7 @@ export function agregarBicicleta(nombre: string, precio: number, marca: string) 
 // READ
 export function mostrarBicicletas() {
 
-    const tabla = document.getElementById("tablaBicicletas") as HTMLTableSectionElement;
+    const tabla = document.getElementById("tablaBicicletas") as HTMLTableSectionElement | null;
 
     if (!tabla) return;
 
@@ -61,7 +61,7 @@ export function editarBicicleta(id: number) {
 
             return {
                 ...b,
-                nombre: nombre ? nombre : b.nombre,
+                nombre: nombre ?? b.nombre,
                 precio: precio ? Number(precio) : b.precio
             };
 
@@ -82,6 +82,6 @@ export function eliminarBicicleta(id: number) {
     mostrarBicicletas();
 }
 
-// Hacer accesibles las funciones desde HTML
-(window as any).editarBicicleta = editarBicicleta;
-(window as any).eliminarBicicleta = eliminarBicicleta;
+/* Hacer accesibles las funciones desde HTML */
+(globalThis as any).editarBicicleta = editarBicicleta;
+(globalThis as any).eliminarBicicleta = eliminarBicicleta;
