@@ -3,54 +3,44 @@ use anchor_lang::prelude::*;
 declare_id!("Bici1111111111111111111111111111111111111");
 
 #[program]
-pub mod bicicletas_solana {
+pub mod bikechain {
     use super::*;
 
     pub fn crear_bicicleta(
         ctx: Context<CrearBicicleta>,
-        nombre: String,
+        modelo: String,
         marca: String,
         precio: u64,
     ) -> Result<()> {
 
         let bicicleta = &mut ctx.accounts.bicicleta;
 
-        bicicleta.nombre = nombre;
+        bicicleta.owner = *ctx.accounts.usuario.key;
+        bicicleta.modelo = modelo;
         bicicleta.marca = marca;
         bicicleta.precio = precio;
-        bicicleta.autor = *ctx.accounts.usuario.key;
+        bicicleta.disponible = true;
 
-        Ok(())
-    }
-
-    pub fn actualizar_bicicleta(
-        ctx: Context<ActualizarBicicleta>,
-        nombre: String,
-        marca: String,
-        precio: u64,
-    ) -> Result<()> {
-
-        let bicicleta = &mut ctx.accounts.bicicleta;
-
-        bicicleta.nombre = nombre;
-        bicicleta.marca = marca;
-        bicicleta.precio = precio;
-
-        Ok(())
-    }
-
-    pub fn eliminar_bicicleta(_ctx: Context<EliminarBicicleta>) -> Result<()> {
         Ok(())
     }
 }
 
 #[derive(Accounts)]
+#[instruction(modelo: String)]
 pub struct CrearBicicleta<'info> {
 
     #[account(
         init,
         payer = usuario,
-        space = 8 + 32 + 50 + 50 + 8
+
+        space = 8 + 32 + 50 + 50 + 8 + 1,
+
+        seeds = [
+            b"bicicleta",
+            modelo.as_bytes(),
+            usuario.key().as_ref()
+        ],
+        bump
     )]
 
     pub bicicleta: Account<'info, Bicicleta>,
@@ -61,34 +51,12 @@ pub struct CrearBicicleta<'info> {
     pub system_program: Program<'info, System>,
 }
 
-#[derive(Accounts)]
-pub struct ActualizarBicicleta<'info> {
-
-    #[account(mut)]
-    pub bicicleta: Account<'info, Bicicleta>,
-
-    pub usuario: Signer<'info>,
-}
-
-#[derive(Accounts)]
-pub struct EliminarBicicleta<'info> {
-
-    #[account(
-        mut,
-        close = usuario
-    )]
-
-    pub bicicleta: Account<'info, Bicicleta>,
-
-    #[account(mut)]
-    pub usuario: Signer<'info>,
-}
-
 #[account]
 pub struct Bicicleta {
 
-    pub autor: Pubkey,
-    pub nombre: String,
+    pub owner: Pubkey,
+    pub modelo: String,
     pub marca: String,
     pub precio: u64,
+    pub disponible: bool,
 }
