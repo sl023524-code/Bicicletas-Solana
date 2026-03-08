@@ -1,34 +1,31 @@
-// No imports needed: web3, anchor, pg and more are globally available
+import * as anchor from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
+import { BicicletasSolana } from "../target/types/bicicletas_solana";
 
-describe("Test", () => {
-  it("initialize", async () => {
-    // Generate keypair for the new account
-    const newAccountKp = new web3.Keypair();
+describe("bicicletas-solana", () => {
 
-    // Send transaction
-    const data = new BN(42);
-    const txHash = await pg.program.methods
-      .initialize(data)
+  const provider = anchor.AnchorProvider.env();
+  anchor.setProvider(provider);
+
+  const program = anchor.workspace.BicicletasSolana as Program<BicicletasSolana>;
+
+  const bicicleta = anchor.web3.Keypair.generate();
+
+  it("Crear bicicleta", async () => {
+
+    await program.methods
+      .crearBicicleta("Bici montaña", "Trek", new anchor.BN(4500))
       .accounts({
-        newAccount: newAccountKp.publicKey,
-        signer: pg.wallet.publicKey,
-        systemProgram: web3.SystemProgram.programId,
+        bicicleta: bicicleta.publicKey,
+        usuario: provider.wallet.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
       })
-      .signers([newAccountKp])
+      .signers([bicicleta])
       .rpc();
-    console.log(`Use 'solana confirm -v ${txHash}' to see the logs`);
 
-    // Confirm transaction
-    await pg.connection.confirmTransaction(txHash);
+    const cuenta = await program.account.bicicleta.fetch(bicicleta.publicKey);
 
-    // Fetch the created account
-    const newAccount = await pg.program.account.newAccount.fetch(
-      newAccountKp.publicKey
-    );
-
-    console.log("On-chain data is:", newAccount.data.toString());
-
-    // Check whether the data on-chain is equal to local 'data'
-    assert(data.eq(newAccount.data));
+    console.log("Bicicleta creada:", cuenta);
   });
+
 });
