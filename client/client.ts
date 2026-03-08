@@ -9,7 +9,8 @@ let bicicletas: Bicicleta[] = [];
 
 // CREATE
 export function agregarBicicleta(nombre: string, precio: number, marca: string) {
-    const nueva = {
+
+    const nueva: Bicicleta = {
         id: Date.now(),
         nombre,
         precio,
@@ -22,11 +23,16 @@ export function agregarBicicleta(nombre: string, precio: number, marca: string) 
 
 // READ
 export function mostrarBicicletas() {
-    const tabla = document.getElementById("tablaBicicletas") as HTMLElement;
+
+    const tabla = document.getElementById("tablaBicicletas") as HTMLTableSectionElement;
+
+    if (!tabla) return;
+
     tabla.innerHTML = "";
 
     bicicletas.forEach(b => {
-        tabla.innerHTML += `
+
+        const fila = `
         <tr>
             <td>${b.id}</td>
             <td>${b.nombre}</td>
@@ -38,25 +44,44 @@ export function mostrarBicicletas() {
             </td>
         </tr>
         `;
+
+        tabla.innerHTML += fila;
     });
 }
 
 // UPDATE
 export function editarBicicleta(id: number) {
-    const nombre = prompt("Nuevo nombre");
+
+    const nombre = prompt("Nuevo nombre de la bicicleta");
     const precio = prompt("Nuevo precio");
 
-    bicicletas = bicicletas.map(b =>
-        b.id === id
-            ? { ...b, nombre: nombre || b.nombre, precio: Number(precio) || b.precio }
-            : b
-    );
+    bicicletas = bicicletas.map(b => {
+
+        if (b.id === id) {
+
+            return {
+                ...b,
+                nombre: nombre ? nombre : b.nombre,
+                precio: precio ? Number(precio) : b.precio
+            };
+
+        }
+
+        return b;
+
+    });
 
     mostrarBicicletas();
 }
 
 // DELETE
 export function eliminarBicicleta(id: number) {
+
     bicicletas = bicicletas.filter(b => b.id !== id);
+
     mostrarBicicletas();
 }
+
+// Hacer accesibles las funciones desde HTML
+(window as any).editarBicicleta = editarBicicleta;
+(window as any).eliminarBicicleta = eliminarBicicleta;
