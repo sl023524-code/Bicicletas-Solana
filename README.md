@@ -1,60 +1,107 @@
-# Biblioteca en Solana
+🚴 BikeChain — Gestión de Bicicletas en Solana
 
-![banner](./images/banner-biblioteca.jpg)
+BikeChain es un programa on-chain desarrollado en Rust con Anchor sobre la blockchain de Solana.
+Permite a dueños de tiendas administrar su catálogo de bicicletas de forma descentralizada, segura e inmutable.
 
-CRUD básico de un Solana Program desarrollado con Rust y Anchor desde el Solana Playground. 
+📌 ¿Qué hace el proyecto?
 
-Puedes comenzar dándole Fork a este repositorio (abajo te explicamos como 👇), **hemos preparado un entorno de codespaces listo para que no tengas que instalar nada**, solo déjate llevar por la fluidez de los ejercicios y temas desarrollados especialmente para ti. 
+BikeChain implementa un sistema CRUD completo para administrar una tienda de bicicletas:
 
-Asegúrate de clonar este repositorio a tu cuenta usando el botón **`Fork`**.
+Crear una tienda vinculada a la wallet del dueño
 
-![fork](./images/fork.png)
+Registrar bicicletas con modelo, marca y precio
 
-## Importando el proyecto 
+Actualizar información de una bicicleta
 
-Ya con el repositorio en tu cuenta lo siguiente que debes hacer copiar el `enlace de tu repositorio`, lo que se puede hacer directamente desdel navegador:
+Eliminar bicicletas del catálogo
 
-![repo](./images/repo.png)
-Posteriormente, lo uniremos con el siguiente enlace en nuestro navegador de preferencia:
+Activar o desactivar bicicletas disponibles para venta
 
-```url
-https://beta.solpg.io/
-```
+Cada tienda y cada bicicleta se guardan como cuentas PDA en Solana, garantizando que:
 
-Lo que nos dará algo parecido a:
+✅ No existan duplicados
+✅ Solo el dueño pueda modificar su tienda
+✅ Los datos queden registrados en blockchain
 
-![url](./images/url.png)
+🏗️ Arquitectura
+Owner (Wallet)
+    │
+    └── Tienda (PDA)
+            │
+            ├── Bicicleta A (PDA)
+            ├── Bicicleta B (PDA)
+            └── Bicicleta C (PDA)
+📦 Structs principales
+Tienda
+Campo	Tipo	Descripción
+owner	Pubkey	Wallet del dueño
+nombre	String	Nombre de la tienda
+bicicletas	Vec<Pubkey>	Lista de bicicletas registradas
+Bicicleta
+Campo	Tipo	Descripción
+tienda	String	Nombre de la tienda
+modelo	String	Modelo de la bicicleta
+marca	String	Marca
+precio	u64	Precio
+disponible	bool	Disponible para venta
+⚙️ Instrucciones del programa
+Instrucción	Descripción
+crear_tienda(nombre)	Crea la tienda vinculada al owner
+registrar_bicicleta(modelo, marca, precio)	Registra una bicicleta
+eliminar_bicicleta(modelo)	Elimina la bicicleta
+alternar_disponibilidad(modelo)	Activa o desactiva venta
+actualizar_precio(modelo, precio)	Cambia el precio
+🔐 PDAs (Program Derived Addresses)
 
-Al pulsar enter seremos enviados al `Solana Playground` con nuestro proyecto abierto:
+Las cuentas se generan con seeds.
 
-![pg](./images/pg.png)
+Tienda
+["tienda", nombre_tienda, owner_pubkey]
+Bicicleta
+["bicicleta", modelo_bicicleta, owner_pubkey]
 
-Para guardarlo solo damos clic en el boton `import` y asignamos un nombre:
+Esto garantiza que:
 
-![import](./images/import.png)
+✔ Cada dueño tenga su propia tienda
+✔ No existan bicicletas duplicadas
+✔ Solo el owner pueda modificar los datos
 
-## Preparacion del entorno
+🚀 Cómo usar el proyecto
 
-Primero conectaremos el entorno con la devnet, lo que tambien procederá a la creación de una wallet. Para eso daremos clic en donde dice **Not Conected**:
+1️⃣ Abre
+👉 Solana Playground
 
-![playground1](./images/playground1.png)
+2️⃣ Haz fork del repositorio en
+👉 GitHub
 
-Saldrá la siguiente ventana donde daremos en el botón **Continue**:
+3️⃣ Pega el código en
 
-![wallet](./images/wallet.png)
+src/lib.rs
 
-Como resultado se mostrará la siguiente información:
+4️⃣ Conecta tu wallet (Devnet)
 
-![status](./images/status.png)
+5️⃣ Haz clic en:
 
-* En verde: el estado de la conexión y el entorno al que se encuentra conectado
+Build
+Deploy
+🧪 Ejemplo de uso
 
-* En amarillo: la la dirección de la wallet conectada
+Flujo para administrar bicicletas:
 
-* En azul: la cantidad de tokens en la wallet
+1 crear_tienda("BikeStore")
 
-> ℹ️ ¿Quieres ver el ejemplo de un "Hola Mundo" en Solana?. Da clic aquí: 👉 [Ver Ejemplo](https://github.com/WayLearnLatam/Solana-starter-kit/tree/1fc6349ba63375a3fe223d8d56911bc64765459b/build-deploy)
+2 registrar_bicicleta("XTR-500", "Trek", 4500)
 
-> ℹ️ ¿Cuentas con una Wallet de [Phantom](https://phantom.com/) que deseas importar?, Da clic aquí para ver como hacerlo: 
+3 alternar_disponibilidad("XTR-500")
 
-👉 [Como Importar una Wallet](https://github.com/WayLearnLatam/Solana-starter-kit/tree/1fc6349ba63375a3fe223d8d56911bc64765459b/import-key-a-playground)
+4 actualizar_precio("XTR-500", 5200)
+
+5 eliminar_bicicleta("XTR-500")
+🛠️ Tecnologías
+Tecnología	Uso
+Solana	Blockchain
+Anchor Framework	Framework de programas
+Rust	Lenguaje del smart contract
+👤 Autor
+
+Proyecto desarrollado por Sebas como parte de su aprendizaje en desarrollo blockchain con Solana.
