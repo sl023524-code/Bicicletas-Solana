@@ -16,7 +16,7 @@ pub mod bikechain {
 
         let bicicleta = &mut ctx.accounts.bicicleta;
 
-        bicicleta.owner = *ctx.accounts.usuario.key;
+        bicicleta.owner = ctx.accounts.usuario.key();
         bicicleta.modelo = modelo;
         bicicleta.marca = marca;
         bicicleta.precio = precio;
@@ -44,7 +44,8 @@ pub mod bikechain {
 
     // ELIMINAR BICICLETA
     pub fn eliminar_bicicleta(
-        _ctx: Context<EliminarBicicleta>
+        _ctx: Context<EliminarBicicleta>,
+        _modelo: String
     ) -> Result<()> {
 
         Ok(())
@@ -58,9 +59,7 @@ pub struct CrearBicicleta<'info> {
     #[account(
         init,
         payer = usuario,
-
         space = 8 + 32 + 50 + 50 + 8 + 1,
-
         seeds = [
             b"bicicleta",
             modelo.as_bytes(),
@@ -78,13 +77,14 @@ pub struct CrearBicicleta<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(modelo: String)]
 pub struct ActualizarBicicleta<'info> {
 
     #[account(
         mut,
         seeds = [
             b"bicicleta",
-            bicicleta.modelo.as_bytes(),
+            modelo.as_bytes(),
             usuario.key().as_ref()
         ],
         bump
@@ -96,6 +96,7 @@ pub struct ActualizarBicicleta<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(modelo: String)]
 pub struct EliminarBicicleta<'info> {
 
     #[account(
@@ -103,7 +104,7 @@ pub struct EliminarBicicleta<'info> {
         close = usuario,
         seeds = [
             b"bicicleta",
-            bicicleta.modelo.as_bytes(),
+            modelo.as_bytes(),
             usuario.key().as_ref()
         ],
         bump
