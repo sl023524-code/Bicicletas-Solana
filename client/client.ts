@@ -9,6 +9,9 @@ async function main() {
 
   const bicicleta = anchor.web3.Keypair.generate();
 
+  console.log("Cuenta bicicleta:", bicicleta.publicKey.toString());
+
+  // CREATE
   await program.methods
     .crearBicicleta("Trek500", "Trek", new anchor.BN(5000))
     .accounts({
@@ -19,7 +22,30 @@ async function main() {
     .signers([bicicleta])
     .rpc();
 
-  console.log("Bicicleta creada:", bicicleta.publicKey.toString());
+  console.log("Bicicleta creada");
+
+  // UPDATE
+  await program.methods
+    .actualizarBicicleta("Trek600", "Trek", new anchor.BN(6000))
+    .accounts({
+      bicicleta: bicicleta.publicKey,
+      usuario: provider.wallet.publicKey,
+    })
+    .rpc();
+
+  console.log("Bicicleta actualizada");
+
+  // DELETE
+  await program.methods
+    .eliminarBicicleta()
+    .accounts({
+      bicicleta: bicicleta.publicKey,
+      usuario: provider.wallet.publicKey,
+    })
+    .rpc();
+
+  console.log("Bicicleta eliminada");
+
 }
 
 main();
