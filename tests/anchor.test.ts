@@ -2,26 +2,52 @@ import * as anchor from "@coral-xyz/anchor";
 
 describe("bici", () => {
 
-  const provider = anchor.AnchorProvider.env();
-  anchor.setProvider(provider);
+const provider = anchor.AnchorProvider.env();
+anchor.setProvider(provider);
 
-  const program = anchor.workspace.Bici;
+const program = anchor.workspace.Bici;
 
-  it("Crear bicicleta", async () => {
+it("CRUD bicicleta", async () => {
 
-    const bicicleta = anchor.web3.Keypair.generate();
+```
+const bicicleta = anchor.web3.Keypair.generate();
 
-    await program.methods
-      .crearBicicleta("Trek500", "Trek", new anchor.BN(5000))
-      .accounts({
-        bicicleta: bicicleta.publicKey,
-        usuario: provider.wallet.publicKey,
-        systemProgram: anchor.web3.SystemProgram.programId,
-      })
-      .signers([bicicleta])
-      .rpc();
+// CREATE
+await program.methods
+  .crearBicicleta("Trek500", "Trek", new anchor.BN(5000))
+  .accounts({
+    bicicleta: bicicleta.publicKey,
+    usuario: provider.wallet.publicKey,
+    systemProgram: anchor.web3.SystemProgram.programId,
+  })
+  .signers([bicicleta])
+  .rpc();
 
-    console.log("Bicicleta creada");
-  });
+console.log("Bicicleta creada");
+
+// UPDATE
+await program.methods
+  .actualizarBicicleta("Trek600", "Trek", new anchor.BN(6000))
+  .accounts({
+    bicicleta: bicicleta.publicKey,
+    usuario: provider.wallet.publicKey,
+  })
+  .rpc();
+
+console.log("Bicicleta actualizada");
+
+// DELETE
+await program.methods
+  .eliminarBicicleta()
+  .accounts({
+    bicicleta: bicicleta.publicKey,
+    usuario: provider.wallet.publicKey,
+  })
+  .rpc();
+
+console.log("Bicicleta eliminada");
+```
+
+});
 
 });
