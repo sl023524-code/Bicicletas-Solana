@@ -1,58 +1,58 @@
 use anchor_lang::prelude::*;
 
-declare_id!("11111111111111111111111111111111");
+declare_id!("Bici1111111111111111111111111111111111111");
 
 #[program]
-pub mod bici {
+pub mod bicicletas_solana {
     use super::*;
 
-    // CREATE
     pub fn crear_bicicleta(
         ctx: Context<CrearBicicleta>,
-        modelo: String,
-        marca: String,
+        nombre: String,
         precio: u64,
     ) -> Result<()> {
 
         let bicicleta = &mut ctx.accounts.bicicleta;
 
-        bicicleta.owner = ctx.accounts.usuario.key();
-        bicicleta.modelo = modelo;
-        bicicleta.marca = marca;
+        bicicleta.nombre = nombre;
         bicicleta.precio = precio;
+        bicicleta.usuario = *ctx.accounts.usuario.key;
 
         Ok(())
     }
 
-    // UPDATE
     pub fn actualizar_bicicleta(
         ctx: Context<ActualizarBicicleta>,
-        modelo: String,
-        marca: String,
+        nombre: String,
         precio: u64,
     ) -> Result<()> {
 
         let bicicleta = &mut ctx.accounts.bicicleta;
 
-        bicicleta.modelo = modelo;
-        bicicleta.marca = marca;
+        bicicleta.nombre = nombre;
         bicicleta.precio = precio;
 
         Ok(())
     }
 
-    // DELETE
     pub fn eliminar_bicicleta(
-        _ctx: Context<EliminarBicicleta>
+        _ctx: Context<EliminarBicicleta>,
     ) -> Result<()> {
         Ok(())
     }
 }
 
 #[derive(Accounts)]
+#[instruction(nombre: String)]
 pub struct CrearBicicleta<'info> {
 
-    #[account(init, payer = usuario, space = 8 + 32 + 64 + 64 + 8)]
+    #[account(
+        init,
+        payer = usuario,
+        space = 8 + 100 + 8 + 32,
+        seeds = [b"bicicleta", usuario.key().as_ref(), nombre.as_bytes()],
+        bump
+    )]
     pub bicicleta: Account<'info, Bicicleta>,
 
     #[account(mut)]
@@ -64,7 +64,11 @@ pub struct CrearBicicleta<'info> {
 #[derive(Accounts)]
 pub struct ActualizarBicicleta<'info> {
 
-    #[account(mut)]
+    #[account(
+        mut,
+        seeds = [b"bicicleta", usuario.key().as_ref(), bicicleta.nombre.as_bytes()],
+        bump
+    )]
     pub bicicleta: Account<'info, Bicicleta>,
 
     pub usuario: Signer<'info>,
@@ -73,7 +77,12 @@ pub struct ActualizarBicicleta<'info> {
 #[derive(Accounts)]
 pub struct EliminarBicicleta<'info> {
 
-    #[account(mut, close = usuario)]
+    #[account(
+        mut,
+        close = usuario,
+        seeds = [b"bicicleta", usuario.key().as_ref(), bicicleta.nombre.as_bytes()],
+        bump
+    )]
     pub bicicleta: Account<'info, Bicicleta>,
 
     #[account(mut)]
@@ -82,8 +91,8 @@ pub struct EliminarBicicleta<'info> {
 
 #[account]
 pub struct Bicicleta {
-    pub owner: Pubkey,
-    pub modelo: String,
-    pub marca: String,
+
+    pub nombre: String,
     pub precio: u64,
+    pub usuario: Pubkey,
 }
