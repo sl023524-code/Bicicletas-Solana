@@ -1,53 +1,87 @@
 import * as anchor from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
+import { BicicletasSolana } from "../target/types/bicicletas_solana";
 
-describe("bici", () => {
+describe("bicicletas-solana", () => {
 
-const provider = anchor.AnchorProvider.env();
-anchor.setProvider(provider);
+  const provider = anchor.AnchorProvider.env();
+  anchor.setProvider(provider);
 
-const program = anchor.workspace.Bici;
+  const program = anchor.workspace.BicicletasSolana as Program<BicicletasSolana>;
 
-it("CRUD bicicleta", async () => {
+  const wallet = provider.wallet;
 
-```
-const bicicleta = anchor.web3.Keypair.generate();
+  const nombre = "Bicicleta MTB";
+  const precio = new anchor.BN(9000);
 
-// CREATE
-await program.methods
-  .crearBicicleta("Trek500", "Trek", new anchor.BN(5000))
-  .accounts({
-    bicicleta: bicicleta.publicKey,
-    usuario: provider.wallet.publicKey,
-    systemProgram: anchor.web3.SystemProgram.programId,
-  })
-  .signers([bicicleta])
-  .rpc();
+  let bicicletaPDA: anchor.web3.PublicKey;
 
-console.log("Bicicleta creada");
+  it("Crear bicicleta", async () => {
 
-// UPDATE
-await program.methods
-  .actualizarBicicleta("Trek600", "Trek", new anchor.BN(6000))
-  .accounts({
-    bicicleta: bicicleta.publicKey,
-    usuario: provider.wallet.publicKey,
-  })
-  .rpc();
+    [bicicletaPDA] = anchor.web3.PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("bicicleta"),
+        wallet.publicKey.toBuffer(),
+        Buffer.from(nombre),
+      ],
+      program.programId
+    );
 
-console.log("Bicicleta actualizada");
+    await program.methods
+      .crearBicicleta(nombre, precio)
+      .accounts({
+        bicicleta: bicicletaPDA,
+        usuario: wallet.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
 
-// DELETE
-await program.methods
-  .eliminarBicicleta()
-  .accounts({
-    bicicleta: bicicleta.publicKey,
-    usuario: provider.wallet.publicKey,
-  })
-  .rpc();
+    console.log("Bicicleta creada:", bicicletaPDA.toString());
+  });
 
-console.log("Bicicleta eliminada");
-```
 
-});
+  it("Leer bicicletas", async () => {
+
+    const bicicletas = await program.account.bicicleta.all();
+
+    bicicletas.forEach((bici) => {
+
+      console.log("Dirección:", bici.publicKey.toString());
+      console.log("Nombre:", bici.account.nombre);
+      console.log("Precio:", bici.account.precio.toNumber());
+
+    });
+
+  });
+
+
+  it("Actualizar bicicleta", async () => {
+
+    await program.methods
+      .actualizarBicicleta(nombre, new anchor.BN(8500))
+      .accounts({
+        bicicleta: bicicletaPDA,
+        usuario: wallet.publicKey,
+      })
+      .rpc();
+
+    console.log("Bicicleta actualizada");
+
+  });
+
+
+  it("Eliminar bicicleta", async () => {
+
+    await program.methods
+      .eliminarBicicleta()
+      .accounts({
+        bicicleta: bicicletaPDA,
+        usuario: wallet.publicKey,
+      })
+      .rpc();
+
+    console.log("Bicicleta eliminada");
+
+  });
 
 });
