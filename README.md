@@ -1,107 +1,104 @@
 🚴 BikeChain — Gestión de Bicicletas en Solana
 
 BikeChain es un programa on-chain desarrollado en Rust con Anchor sobre la blockchain de Solana.
-Permite a dueños de tiendas administrar su catálogo de bicicletas de forma descentralizada, segura e inmutable.
+Permite a una tienda administrar su catálogo de bicicletas de forma descentralizada, transparente e inmutable.
 
 📌 ¿Qué hace el proyecto?
 
-BikeChain implementa un sistema CRUD completo para administrar una tienda de bicicletas:
+BikeChain implementa un sistema CRUD completo para administrar bicicletas en una tienda:
 
-Crear una tienda vinculada a la wallet del dueño
+Crear bicicletas registradas por el dueño de la tienda
 
-Registrar bicicletas con modelo, marca y precio
+Consultar todas las bicicletas registradas
 
-Actualizar información de una bicicleta
+Actualizar el precio o información de una bicicleta
 
 Eliminar bicicletas del catálogo
 
-Activar o desactivar bicicletas disponibles para venta
+Cada bicicleta se guarda como una cuenta derivada (PDA) en la blockchain, lo que garantiza que:
 
-Cada tienda y cada bicicleta se guardan como cuentas PDA en Solana, garantizando que:
+Cada bicicleta tenga una dirección única
 
-✅ No existan duplicados
-✅ Solo el dueño pueda modificar su tienda
-✅ Los datos queden registrados en blockchain
+Solo el propietario pueda modificarla
+
+Los datos permanezcan almacenados en la blockchain
 
 🏗️ Arquitectura
 Owner (Wallet)
     │
-    └── Tienda (PDA)
-            │
-            ├── Bicicleta A (PDA)
-            ├── Bicicleta B (PDA)
-            └── Bicicleta C (PDA)
-📦 Structs principales
-Tienda
-Campo	Tipo	Descripción
-owner	Pubkey	Wallet del dueño
-nombre	String	Nombre de la tienda
-bicicletas	Vec<Pubkey>	Lista de bicicletas registradas
+    └── Bicicleta A (PDA)
+    └── Bicicleta B (PDA)
+    └── Bicicleta C (PDA)
+
+El owner (wallet) es quien controla las operaciones del catálogo de bicicletas.
+
+📦 Struct principal
 Bicicleta
 Campo	Tipo	Descripción
-tienda	String	Nombre de la tienda
-modelo	String	Modelo de la bicicleta
-marca	String	Marca
-precio	u64	Precio
-disponible	bool	Disponible para venta
-⚙️ Instrucciones del programa
+nombre	String	Nombre de la bicicleta
+precio	u64	Precio de la bicicleta
+usuario	Pubkey	Wallet del dueño que registró la bicicleta
+⚙️ Instrucciones (Funciones del programa)
 Instrucción	Descripción
-crear_tienda(nombre)	Crea la tienda vinculada al owner
-registrar_bicicleta(modelo, marca, precio)	Registra una bicicleta
-eliminar_bicicleta(modelo)	Elimina la bicicleta
-alternar_disponibilidad(modelo)	Activa o desactiva venta
-actualizar_precio(modelo, precio)	Cambia el precio
+crear_bicicleta(nombre, precio)	Registra una nueva bicicleta
+listar_bicicletas()	Consulta todas las bicicletas registradas
+actualizar_bicicleta(nombre, precio)	Actualiza el precio o datos
+eliminar_bicicleta(nombre)	Elimina la bicicleta del sistema
 🔐 PDAs (Program Derived Addresses)
 
-Las cuentas se generan con seeds.
+Las cuentas de bicicletas se generan usando seeds:
 
-Tienda
-["tienda", nombre_tienda, owner_pubkey]
-Bicicleta
-["bicicleta", modelo_bicicleta, owner_pubkey]
+["bicicleta", owner_pubkey, nombre_bicicleta]
 
 Esto garantiza que:
 
-✔ Cada dueño tenga su propia tienda
-✔ No existan bicicletas duplicadas
-✔ Solo el owner pueda modificar los datos
+Cada bicicleta tiene una dirección única
 
-🚀 Cómo usar el proyecto
+Un usuario no puede registrar dos bicicletas con el mismo nombre
 
-1️⃣ Abre
-👉 Solana Playground
+Solo el owner puede modificar o eliminar su bicicleta
 
-2️⃣ Haz fork del repositorio en
-👉 GitHub
+🚀 Cómo usar el proyecto (Solana Playground)
 
-3️⃣ Pega el código en
+Abrir Solana Playground
 
-src/lib.rs
+Subir o copiar el contenido del archivo lib.rs
 
-4️⃣ Conecta tu wallet (Devnet)
+Conectar tu wallet en Devnet
 
-5️⃣ Haz clic en:
+Hacer clic en:
 
 Build
 Deploy
-🧪 Ejemplo de uso
 
-Flujo para administrar bicicletas:
+Usar los tests o el cliente para interactuar.
 
-1 crear_tienda("BikeStore")
-
-2 registrar_bicicleta("XTR-500", "Trek", 4500)
-
-3 alternar_disponibilidad("XTR-500")
-
-4 actualizar_precio("XTR-500", 5200)
-
-5 eliminar_bicicleta("XTR-500")
+Ejemplo de flujo
+1. crear_bicicleta("Bicicleta MTB", 9000)
+2. listar_bicicletas()
+3. actualizar_bicicleta("Bicicleta MTB", 8500)
+4. eliminar_bicicleta("Bicicleta MTB")
 🛠️ Tecnologías
-Tecnología	Uso
-Solana	Blockchain
-Anchor Framework	Framework de programas
-Rust	Lenguaje del smart contract
+
+Solana — Blockchain de alta velocidad
+
+Anchor Framework — Framework para programas Solana
+
+Rust — Lenguaje de programación del programa
+
+📂 Estructura del proyecto
+Bicicletas-Solana
+│
+├── origen
+│   └── lib.rs
+│
+├── cliente
+│   └── client.ts
+│
+├── pruebas
+│   └── anchor.test.ts
+│
+└── README.md
 👤 Autor
 
-Proyecto desarrollado por Sebas como parte de su aprendizaje en desarrollo blockchain con Solana.
+Proyecto desarrollado como parte de la certificación de desarrollo en Solana.
